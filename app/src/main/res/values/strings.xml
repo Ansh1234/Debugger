@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Debugger</string>
     <string name="action_settings">Settings</string>
+    <string-array name="debugger_menu_items">
+        <item>Memory</item>
+        <item>Network</item>
+        <item>CPU</item>
+    </string-array>
 </resources>

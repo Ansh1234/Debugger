@@ -13,8 +13,26 @@
     tools:context="awesomedroidapps.com.debugger.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:id="@+id/debugger_window"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:orientation="vertical">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/debugger_tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="center"
+            app:tabMode="scrollable"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/debugger_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
+
+    </LinearLayout>
+
+
 </RelativeLayout>

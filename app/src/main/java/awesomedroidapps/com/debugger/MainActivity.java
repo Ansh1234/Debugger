@@ -1,31 +1,44 @@
 package awesomedroidapps.com.debugger;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+
+  TabLayout debuggerTabLayout;
+  ViewPager debuggerViewPager;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    debuggerTabLayout = (TabLayout) findViewById(R.id.debugger_tablayout);
+    debuggerViewPager = (ViewPager) findViewById(R.id.debugger_pager);
+
+
+    String[] debugMenuItems = getResources().getStringArray(R.array.debugger_menu_items);
+    for (int i = 0; i < debugMenuItems.length; i++) {
+      TabLayout.Tab tab = debuggerTabLayout.newTab();
+      tab.setText(debugMenuItems[i]);
+      debuggerTabLayout.addTab(tab);
+    }
+    debuggerTabLayout.setOnTabSelectedListener(this);
+
+    DebuggerPagerAdapter adapter = new DebuggerPagerAdapter(getSupportFragmentManager());
+    debuggerViewPager.setAdapter(adapter);
+    debuggerViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(
+        debuggerTabLayout));
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-            .setAction("Action", null).show();
-      }
-    });
+
   }
 
   @Override
@@ -48,5 +61,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onTabSelected(TabLayout.Tab tab) {
+
+    debuggerViewPager.setCurrentItem(tab.getPosition());
+  }
+
+  @Override
+  public void onTabUnselected(TabLayout.Tab tab) {
+
+  }
+
+  @Override
+  public void onTabReselected(TabLayout.Tab tab) {
+
   }
 }
