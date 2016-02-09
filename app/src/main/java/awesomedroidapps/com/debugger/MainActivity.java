@@ -1,5 +1,6 @@
 package awesomedroidapps.com.debugger;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -7,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
@@ -37,6 +40,24 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+
+    Button startServiceBtn = (Button) findViewById(R.id.start_service);
+    startServiceBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(MainActivity.this, DebuggerWindow.class);
+        startService(intent);
+      }
+    });
+
+    Button stopServiceBtn = (Button) findViewById(R.id.stop_servive);
+    stopServiceBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(MainActivity.this, DebuggerWindow.class);
+        stopService(intent);
+      }
+    });
 
 
   }
