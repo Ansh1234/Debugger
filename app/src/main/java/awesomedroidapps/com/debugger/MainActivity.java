@@ -3,7 +3,6 @@ package awesomedroidapps.com.debugger;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -11,42 +10,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
+
+import awesomedroidapps.com.debugger.utils.NativeController;
+
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
-  TabLayout debuggerTabLayout;
-  ViewPager debuggerViewPager;
 
+
+  public  static final ArrayList arrayList = new ArrayList();
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    debuggerTabLayout = (TabLayout) findViewById(R.id.debugger_tablayout);
-    debuggerViewPager = (ViewPager) findViewById(R.id.debugger_pager);
-
-
-    String[] debugMenuItems = getResources().getStringArray(R.array.debugger_menu_items);
-    for (int i = 0; i < debugMenuItems.length; i++) {
-      TabLayout.Tab tab = debuggerTabLayout.newTab();
-      tab.setText(debugMenuItems[i]);
-      debuggerTabLayout.addTab(tab);
-    }
-    debuggerTabLayout.setOnTabSelectedListener(this);
-
-    DebuggerPagerAdapter adapter = new DebuggerPagerAdapter(getSupportFragmentManager());
-    debuggerViewPager.setAdapter(adapter);
-    debuggerViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(
-        debuggerTabLayout));
-
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
+    for(int i=0;i<500000;i++){
+      arrayList.add("ANshul");
+    }
     Button startServiceBtn = (Button) findViewById(R.id.start_service);
     startServiceBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        Intent intent = new Intent(MainActivity.this, DebuggerWindow.class);
-        startService(intent);
+        if (!DebuggerService.isServiceRunning()) {
+          Intent intent = new Intent(MainActivity.this, DebuggerService.class);
+          startService(intent);
+        }
       }
     });
 
@@ -54,8 +45,37 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     stopServiceBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        Intent intent = new Intent(MainActivity.this, DebuggerWindow.class);
-        stopService(intent);
+        if (DebuggerService.isServiceRunning()) {
+          Intent intent = new Intent(MainActivity.this, DebuggerService.class);
+          stopService(intent);
+        }
+      }
+    });
+
+    Button ramUsageBtn = (Button)findViewById(R.id.ram_usage);
+    ramUsageBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            for(int i=0;i<500000;i++){
+              arrayList.add("ANshul");
+            }
+          }
+        }).start();
+
+        DeleteActivity.getMemoryInformation(MainActivity.this);
+      }
+    });
+
+    Button justRamUsageBtn = (Button)findViewById(R.id.ram_usage_simple);
+    justRamUsageBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+
+        DeleteActivity.getMemoryInformation(MainActivity.this);
+        NativeController.returnRunningProcesses("com.eterno");
       }
     });
 
@@ -87,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   @Override
   public void onTabSelected(TabLayout.Tab tab) {
 
-    debuggerViewPager.setCurrentItem(tab.getPosition());
+    //debuggerViewPager.setCurrentItem(tab.getPosition());
   }
 
   @Override

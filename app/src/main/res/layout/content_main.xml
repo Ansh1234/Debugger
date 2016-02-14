@@ -27,11 +27,17 @@
             app:tabGravity="center"
             app:tabMode="scrollable"/>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/debugger_pager"
+        <Button
             android:layout_width="match_parent"
-            android:layout_height="0dp"></android.support.v4.view.ViewPager>
+            android:layout_height="wrap_content"
+            android:id="@+id/ram_usage"
+            android:text="Know your RAM"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ram_usage_simple"
+            android:text="Just Know your RAM"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
