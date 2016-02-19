@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     setSupportActionBar(toolbar);
     System.loadLibrary("jnetpcap");
     System.loadLibrary("custompcap");
-    new MyPcap().capture();
 
    PacketCaptureHandling.handleCapture(this);
 

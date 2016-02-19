@@ -24,3 +24,5 @@ LOCAL_CFLAGS+=-DHAVE_CONFIG_H -D_U_="__attribute__((unused))" -Dlinux -D__GLIBC_
 LOCAL_MODULE:= libpcap
 
 include $(BUILD_STATIC_LIBRARY)
+
+$(call import-module,libpcap)

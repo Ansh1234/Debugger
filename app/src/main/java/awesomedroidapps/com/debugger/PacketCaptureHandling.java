@@ -8,10 +8,15 @@ import org.jnetpcap.PcapDumper;
 import org.jnetpcap.PcapHeader;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.nio.JBuffer;
+import org.jnetpcap.nio.JMemory;
 import org.jnetpcap.packet.JPacket;
 import org.jnetpcap.packet.JPacketHandler;
+import org.jnetpcap.packet.JRegistry;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
+import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.lan.Ethernet;
+import org.jnetpcap.protocol.network.Ip4;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,50 +50,66 @@ public class PacketCaptureHandling {
       return;
     }
 
-    List<PcapIf> alldevs = new ArrayList<PcapIf>(); // Will be filled with NICs
+
+    if (pcap == null) {
+      System.err.printf("Error while opening device for capture: "
+          + errbuf.toString());
+      return;
+    }
 
     /***************************************************************************
-     * First get a list of devices on this system
+     * Third we create a packet handler which will receive packets from the
+     * libpcap loop.
      **************************************************************************/
-    int r = Pcap.findAllDevs(alldevs, errbuf);
-
-    PcapDumper dumper = pcap.dumpOpen(FILENAME); // output file
+    Ip4 ip = new Ip4();
+    Ethernet eth = new Ethernet();
+    PcapHeader hdr = new PcapHeader(JMemory.POINTER);
+    JBuffer buf = new JBuffer(JMemory.POINTER);
 
     /***************************************************************************
-     * Fouth we typically create a java handler at this point, which hands the
-     * received packets over to the dumper. We are invoking a specilized loop
-     * handler that will provide a more efficient native handler function that
-     * will dump our packets to the dumper without having to enter java
-     * environment.
+     * Third - we must map pcap's data-link-type to jNetPcap's protocol IDs.
+     * This is needed by the scanner so that it knows what the first header in
+     * the packet is.
      **************************************************************************/
-    // No java handler needed
+    int id = JRegistry.mapDLTToId(pcap.datalink());
 
     /***************************************************************************
-     * Fifth we enter the loop and tell it to capture 10 packets. We pass in the
-     * dumper created in step 3. The handler is provided natively.
+     * Fourth - we peer header and buffer (not copy, think of C pointers)
      **************************************************************************/
-    pcap.loop(10, dumper);
-    File fileNew = new File(FILENAME);
-    System.out.printf("%s file has %d bytes in it!\n", fileNew, file.length());
+    while (pcap.nextEx(hdr, buf) == Pcap.NEXT_EX_OK) {
 
-    PcapPacketHandler<String> jpacketHandler = new PcapPacketHandler<String>() {
+      /*************************************************************************
+       * Fifth - we copy header and buffer data to new packet object
+       ************************************************************************/
+      PcapPacket packet = new PcapPacket(hdr, buf);
 
-      public void nextPacket(PcapPacket packet, String user) {
+      /*************************************************************************
+       * Six- we scan the new packet to discover what headers it contains
+       ************************************************************************/
+      packet.scan(id);
 
-        System.out.printf("Received at %s caplen=%-4d len=%-4d %s\n",
-            new Date(packet.getCaptureHeader().timestampInMillis()),
-            packet.getCaptureHeader().caplen(), // Length actually captured
-            packet.getCaptureHeader().wirelen(), // Original length
-            user // User supplied object
-        );
+            /*
+             * We use FormatUtils (found in org.jnetpcap.packet.format package), to
+             * convert our raw addresses to a human readable string.
+             */
+      if (packet.hasHeader(eth)) {
+        String str = FormatUtils.mac(eth.source());
+        System.out.printf("#%d: eth.src=%s\n", packet.getFrameNumber(), str);
       }
-    };
+      if (packet.hasHeader(ip)) {
+        String str = FormatUtils.ip(ip.source());
+        System.out.printf("#%d: ip.src=%s\n", packet.getFrameNumber(), str);
+      }
 
+      PcapHeader header = packet.getCaptureHeader();
 
+    }
 
-
-
-
+    /*************************************************************************
+     * Last thing to do is close the pcap handle
+     ************/
+    pcap.close();
   }
 
 }
+
