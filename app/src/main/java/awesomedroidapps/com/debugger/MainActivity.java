@@ -1,24 +1,41 @@
 package awesomedroidapps.com.debugger;
 
+import android.app.ActivityManager;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.net.VpnService;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import org.jnetpcap.Pcap;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import awesomedroidapps.com.debugger.jni.MyPcap;
+import awesomedroidapps.com.debugger.utils.ApplicationUtils;
+import awesomedroidapps.com.debugger.utils.FileUtils;
 import awesomedroidapps.com.debugger.utils.NativeController;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
 
+  public static final ArrayList arrayList = new ArrayList();
 
-  public  static final ArrayList arrayList = new ArrayList();
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -26,10 +43,28 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+    System.loadLibrary("jnetpcap");
+    System.loadLibrary("custompcap");
+    new MyPcap().capture();
 
-    for(int i=0;i<500000;i++){
-      arrayList.add("ANshul");
-    }
+   PacketCaptureHandling.handleCapture(this);
+
+
+    Button startVpnServiceBtn = (Button) findViewById(R.id.start_vpn_service);
+    startVpnServiceBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (!DebuggerService.isServiceRunning()) {
+          Intent intent = VpnService.prepare(getApplicationContext());
+          if (intent != null) {
+            startActivityForResult(intent, 0);
+          } else {
+            onActivityResult(0, RESULT_OK, null);
+          }
+        }
+      }
+    });
+
     Button startServiceBtn = (Button) findViewById(R.id.start_service);
     startServiceBtn.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -52,24 +87,24 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
     });
 
-    Button ramUsageBtn = (Button)findViewById(R.id.ram_usage);
+    Button ramUsageBtn = (Button) findViewById(R.id.ram_usage);
     ramUsageBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            for(int i=0;i<500000;i++){
+            for (int i = 0; i < 5000000; i++) {
               arrayList.add("ANshul");
             }
+
           }
         }).start();
 
-        DeleteActivity.getMemoryInformation(MainActivity.this);
       }
     });
 
-    Button justRamUsageBtn = (Button)findViewById(R.id.ram_usage_simple);
+    Button justRamUsageBtn = (Button) findViewById(R.id.ram_usage_simple);
     justRamUsageBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -79,8 +114,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
     });
 
+    ApplicationUtils.getInstalledApplications(this);
 
   }
+
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,4 +156,18 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   public void onTabReselected(TabLayout.Tab tab) {
 
   }
+
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode == RESULT_OK) {
+      Intent intent = new Intent(this, DebuggerVpnService.class);
+
+      intent.putExtra("address", "54.169.181.12");
+      intent.putExtra("port", "6767");
+      intent.putExtra("secret", "secret message");
+      startService(intent);
+    }
+  }
+
+
+
 }

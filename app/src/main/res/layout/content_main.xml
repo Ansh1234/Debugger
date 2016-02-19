@@ -30,6 +30,11 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/start_vpn_service"
+            android:text="Start Vpn Service"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/ram_usage"
             android:text="Know your RAM"/>
 
