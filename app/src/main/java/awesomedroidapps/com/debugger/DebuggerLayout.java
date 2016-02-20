@@ -3,7 +3,6 @@ package awesomedroidapps.com.debugger;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.support.design.widget.TabLayout;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,8 +10,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import awesomedroidapps.com.debugger.utils.MemoryUtils;
 
 /**
  * @author anshul.jain on 2/14/2016.
@@ -57,7 +54,7 @@ public class DebuggerLayout implements TabLayout.OnTabSelectedListener {
 
     LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService
         (Context.LAYOUT_INFLATER_SERVICE);
-    debuggerView = (LinearLayout) layoutInflater.inflate(R.layout.debugger_main, null);
+    debuggerView = (LinearLayout) layoutInflater.inflate(R.layout.activity_debugger, null);
     packageNameTextView = (TextView) debuggerView.findViewById(R.id.package_name);
     activityNameTextView = (TextView) debuggerView.findViewById(R.id.activity_name);
 

@@ -17,7 +17,7 @@ public class MemoryView {
 
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context
         .LAYOUT_INFLATER_SERVICE);
-    return inflater.inflate(R.layout.debugger_memory_layout, collection, false);
+    return inflater.inflate(R.layout.view_debugger_memory, collection, false);
   }
 }
 

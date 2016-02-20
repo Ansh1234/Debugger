@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
     setSupportActionBar(toolbar);
     System.loadLibrary("jnetpcap");
     System.loadLibrary("custompcap");
